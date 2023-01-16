@@ -1,0 +1,288 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { useParams } from "react-router-dom";
+
+import data from "../asset/certifModel";
+
+export const Cretificat = () => {
+  const { id } = useParams();
+  console.log(id);
+
+  const [certificat, setCertificat] = useState([]);
+  const [nomDoctor, setNomDoctor] = useState(".....................");
+  const [nomPation, setNomPation] = useState("...................");
+  const [date, setDate] = useState("");
+  const [nomberJour, setNomberJour] = useState("....................");
+  const [dateDebut, setDateDebut] = useState("......................");
+  const [dateFin, setDateFin] = useState(".....................");
+  const [place, setPlace] = useState("...................");
+  const [handicap, setHandicap] = useState(".............");
+  const [isTrue, setIsTrue] = useState(true);
+
+  const [textPrinter, setTextPrinter] = useState("");
+  const [textPrinter2, setTextPrinter2] = useState("");
+
+  useEffect(() => {
+    axios.get(` http://localhost:8082/model/${id}`).then((response) => {
+      setCertificat(response.data);
+    });
+  }, []);
+
+  const save = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:8082/saveInfo", {
+        nomDoctor,
+        nomPation,
+        date,
+        nomberJour,
+        dateDebut,
+        dateFin,
+        place,
+      })
+      .then((res) => console.log("posting success", res))
+      .catch((err) => console.log(err));
+  };
+
+  const handleSubmit1 = (e) => {
+    e.preventDefault();
+    setTextPrinter(
+      certificat.part1 +
+        " " +
+        nomDoctor +
+        " " +
+        certificat.part2 +
+        " " +
+        date +
+        " " +
+        certificat.part10 +
+        " " +
+        nomPation +
+        " " +
+        certificat.part3 +
+        " " +
+        nomberJour +
+        " " +
+        certificat.part4 +
+        " " +
+        dateDebut +
+        " " +
+        certificat.part5 +
+        " " +
+        dateFin +
+        " " +
+        certificat.part6
+    );
+    setTextPrinter2(
+      certificat.part7 + " " + place + " " + certificat.part8 + " " + date
+    );
+
+    setIsTrue(false);
+  };
+  const handleSubmit2 = (e) => {
+    e.preventDefault();
+    setTextPrinter(
+      certificat.part1 +
+        " " +
+        nomDoctor +
+        " " +
+        certificat.part2 +
+        " " +
+        date +
+        " " +
+        certificat.part10 +
+        " " +
+        nomPation +
+        " " +
+        certificat.part3 +
+        " " +
+        nomberJour +
+        " " +
+        certificat.part4
+    );
+    setTextPrinter2(
+      certificat.part5 + " " + place + " " + certificat.part6 + " " + date
+    );
+
+    setIsTrue(false);
+  };
+
+  const generatePDF = () => {
+    const input = document.getElementById("content");
+    html2canvas(input).then((canvas) => {
+      const imgData = canvas.toDataURL(
+        "https://cdn5.f-cdn.com/contestentries/121467/4087826/545ede63e8fe9_thumb900.jpg"
+      );
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, "PNG", 0, 0);
+      pdf.save("download.pdf");
+    });
+
+    // let doc = new jsPDF("p", "pt", "a4");
+    // doc.html(document.querySelector("#content"), {
+    //   callback: function (pdf) {
+    //     pdf.save("certif.pdf");
+    //   },
+    // });
+  };
+  const clear1 = (e) => {
+    e.preventDefault();
+    setNomDoctor("..........");
+    setNomPation("............");
+    setDate("..................");
+    setDateDebut("............");
+    setDateFin("..........");
+    setNomberJour(".........");
+    setPlace(" ............ ");
+    handleSubmit1(e);
+  };
+  let v;
+  let text1;
+  let text2;
+
+  if (id == 1) {
+    v = (
+      <>
+        <div className="input-item">
+          <input
+            type="text"
+            value={nomDoctor}
+            onChange={(e) => setNomDoctor(e.target.value)}
+          />
+          <label> الاسم الكامل</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="text"
+            value={nomPation}
+            onChange={(e) => setNomPation(e.target.value)}
+          />
+          <label> اسم المريض</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          <label>التاريخ</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="number"
+            value={nomberJour}
+            onChange={(e) => setNomberJour(e.target.value)}
+          />
+          <label> مدة التوقف عن العمل</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="date"
+            value={dateDebut}
+            onChange={(e) => setDateDebut(e.target.value)}
+          />
+          <label>ابتداء من يوم</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="date"
+            value={dateFin}
+            onChange={(e) => setDateFin(e.target.value)}
+          />
+          <label>الى غاية</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="text"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+          />
+          <label>حرر ب</label>
+        </div>
+        <button onClick={handleSubmit1} className=" btn-primry btn-apply">
+          Apply
+        </button>
+        <button onClick={clear1} className=" btn-primry ">
+          Clear
+        </button>
+      </>
+    );
+  } else if (id == 2) {
+    v = (
+      <>
+        <div className="input-item">
+          <input
+            type="text"
+            value={nomDoctor}
+            onChange={(e) => setNomDoctor(e.target.value)}
+          />
+          <label> الاسم الكامل</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="text"
+            value={nomPation}
+            onChange={(e) => setNomPation(e.target.value)}
+          />
+          <label> اسم المريض</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          <label>التاريخ</label>
+        </div>
+        <div className="input-item">
+          <input
+            type="text"
+            value={handicap}
+            onChange={(e) => setHandicap(e.target.value)}
+          />
+          <label>نوع الإعاقة</label>
+        </div>
+
+        <div className="input-item">
+          <input
+            type="text"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+          />
+          <label>حرر ب</label>
+        </div>
+        <button onClick={handleSubmit2} className=" btn-primry btn-apply">
+          apply
+        </button>
+        <button onClick={clear1} className=" btn-primry ">
+          clear
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <div className="certif-container-page">
+      <div className="certificat-text">
+        <div id="content">
+          <p className="text-final">{isTrue ? text1 : textPrinter}</p>
+          <p className="text-final"> {isTrue ? text2 : textPrinter2}</p>
+          <p> إمضاء </p>
+        </div>
+        <button onClick={generatePDF} className=" btn-primry">
+          PDF
+        </button>
+        <button onClick={save} className="btn-primry">
+          Save
+        </button>
+      </div>
+
+      <form className="form-certif">
+        <h2>information</h2>
+        {v}
+      </form>
+    </div>
+  );
+};
